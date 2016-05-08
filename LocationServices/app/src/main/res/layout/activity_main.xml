@@ -19,8 +19,15 @@
 
     <Button
         android:id="@+id/addGeoFence"
-        android:layout_below="@+id/getAddressButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_below="@+id/getAddressButton"
         android:text="ADD GEO FENCING"/>
+
+
+    <FrameLayout
+        android:id="@+id/my_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/addGeoFence"></FrameLayout>
 </RelativeLayout>

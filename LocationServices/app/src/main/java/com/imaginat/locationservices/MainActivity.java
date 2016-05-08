@@ -1,5 +1,6 @@
 package com.imaginat.locationservices;
 
+import android.app.FragmentTransaction;
 import android.app.PendingIntent;
 import android.content.Intent;
 import android.content.IntentSender;
@@ -30,13 +31,18 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.LocationSettingsRequest;
 import com.google.android.gms.location.LocationSettingsResult;
 import com.google.android.gms.location.LocationSettingsStatusCodes;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.MapFragment;
+import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.util.ArrayList;
 import java.util.Map;
 
 public class MainActivity extends AppCompatActivity
- implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener,LocationListener,ResultCallback<Status> {
+ implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener,
+        LocationListener,ResultCallback<Status>, OnMapReadyCallback {
 
     public static final String TAG = MainActivity.class.getName();
     private static final int REQUEST_FINE_LOCATION = 0;
@@ -70,6 +76,24 @@ public class MainActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        MapFragment mMapFragment = MapFragment.newInstance();
+        FragmentTransaction fragmentTransaction =
+                getFragmentManager().beginTransaction();
+        fragmentTransaction.add(R.id.my_container, mMapFragment,"THEMAP");
+        fragmentTransaction.commit();
+
+        getFragmentManager().executePendingTransactions();
+
+        MapFragment mapFragment = (MapFragment) getFragmentManager()
+                .findFragmentByTag("THEMAP");
+        if(mapFragment==null){
+            Log.d(TAG,"mapFragment is NULL");
+            mMapFragment.getMapAsync(this);
+        }else{
+            Log.d(TAG,"mapFragment is NOT NULL");
+            // mapFragment.getMapAsync(this);
+        }
 
 
         Log.d(TAG, "onCreate about to call mGoogleApiClient.Builder");
@@ -399,6 +423,19 @@ public class MainActivity extends AppCompatActivity
                     status.getStatusCode());
             Log.e(TAG, errorMessage);
         }
+    }
+
+    @Override
+    public void onMapReady(GoogleMap googleMap) {
+        Log.d(TAG,"Inside onMapReady");
+        GoogleMap map = googleMap;
+        for (Map.Entry<String, LatLng> entry : Constants.MY_LANDMARKS.entrySet()) {
+            map.addMarker(new MarkerOptions()
+                    .position(new LatLng(entry.getValue().latitude, entry.getValue().longitude))
+                    .title("Marker"));
+
+        }
+
     }
 
     //====================================================================================
