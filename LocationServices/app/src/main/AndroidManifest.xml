@@ -19,6 +19,7 @@
         <service
             android:name="com.imaginat.locationservices.FetchAddressIntentService"
             android:exported="false"/>
+        <service android:name="com.imaginat.locationservices.GeofenceTransitionsIntentService"/>
         <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>

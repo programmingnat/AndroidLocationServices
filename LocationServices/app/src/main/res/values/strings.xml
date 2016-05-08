@@ -5,4 +5,16 @@
     <string name="invalid_lat_long_used">invalid latitude and longitude used</string>
     <string name="no_address_found">no address found</string>
     <string name="address_found">address found</string>
+    <string name='geofence_not_available'>geo fence not available</string>
+    <string name="geofence_too_many_geofences">geo fence too many</string>
+    <string name="geofence_too_many_pending_intents">too many geofence intent</string>
+    <string name="unknown_geofence_error">unkown geo fence error</string>
+    <string name="geofence_transition_invalid_type">geofence transition invalid type</string>
+    <string name="geofence_transition_notification_text">notification to text</string>
+    <string name="geofence_transition_entered">transition entered</string>
+    <string name="geofence_transition_exited">transition exited</string>
+    <string name="unknown_geofence_transition">unknown geofence</string>
+    <string name="not_connected">not connected</string>
+    <string name="geofences_added">geo fences added</string>
+    <string name="geofences_removed">geo fences removed</string>
 </resources>
