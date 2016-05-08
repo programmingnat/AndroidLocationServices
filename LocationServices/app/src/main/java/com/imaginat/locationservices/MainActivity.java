@@ -1,13 +1,18 @@
 package com.imaginat.locationservices;
 
+import android.content.Intent;
 import android.content.IntentSender;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.os.ResultReceiver;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -28,9 +33,12 @@ public class MainActivity extends AppCompatActivity
     public static final String TAG = MainActivity.class.getName();
     private static final int REQUEST_FINE_LOCATION = 0;
     final static int REQUEST_LOCATION = 199;
+    static String mAddressOutput;
 
     GoogleApiClient mGoogleApiClient;
     Location mLastLocation;
+    private AddressResultReceiver mResultReceiver;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -43,6 +51,20 @@ public class MainActivity extends AppCompatActivity
                  .addConnectionCallbacks(this)
                 .addApi(LocationServices.API)
                 .build();
+
+        Button addressButton = (Button)findViewById(R.id.getAddressButton);
+        addressButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.d(TAG,"onClick");
+                if (mGoogleApiClient.isConnected()){// && mLastLocation != null) {
+                    Log.d(TAG,"onIntentService about to be called");
+                    startIntentService();
+                }else{
+                    Log.d(TAG,"Nothing being called on click");
+                }
+            }
+        });
     }
 
     @Override
@@ -167,14 +189,14 @@ public class MainActivity extends AppCompatActivity
                     case LocationSettingsStatusCodes.SUCCESS:
                         // All location settings are satisfied. The client can
                         // initialize location requests here.
-                        Log.d(TAG,"Location Setting Requst status code is success");
+                        Log.d(TAG, "Location Setting Requst status code is success");
                         LocationServices.FusedLocationApi.requestLocationUpdates(
                                 mGoogleApiClient, mLocationRequest, MainActivity.this);
                         break;
                     case LocationSettingsStatusCodes.RESOLUTION_REQUIRED:
                         // Location settings are not satisfied, but this can be fixed
                         // by showing the user a dialog.
-                        Log.d(TAG,"Location Setting Requst status code is resolution required");
+                        Log.d(TAG, "Location Setting Requst status code is resolution required");
                         try {
                             // Show the dialog by calling startResolutionForResult(),
                             // and check the result in onActivityResult().
@@ -186,7 +208,7 @@ public class MainActivity extends AppCompatActivity
                         }
                         break;
                     case LocationSettingsStatusCodes.SETTINGS_CHANGE_UNAVAILABLE:
-                        Log.d(TAG,"Location Setting Requst status code is setting change unavaible");
+                        Log.d(TAG, "Location Setting Requst status code is setting change unavaible");
                         // Location settings are not satisfied. However, we have no way
                         // to fix the settings so we won't show the dialog.
 
@@ -207,7 +229,49 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onLocationChanged(Location location) {
+        mLastLocation=location;
         Toast.makeText(this, "Latitude:" + location.getLatitude() + ", Longitude:" + location.getLongitude(), Toast.LENGTH_LONG).show();
         Log.d(TAG, "Latitude:" + location.getLatitude() + ", Longitude:" + location.getLongitude());
     }
+
+    protected void startIntentService() {
+        Intent intent = new Intent(this, FetchAddressIntentService.class);
+        intent.putExtra(Constants.RECEIVER, mResultReceiver);
+        intent.putExtra(Constants.LOCATION_DATA_EXTRA, mLastLocation);
+        startService(intent);
+    }
+
+
+
+    private static void displayAddressOutput(){
+        Log.d(TAG,"the address output "+mAddressOutput);
+    }
+
+
+
+
+    public static class AddressResultReceiver extends ResultReceiver {
+
+        String CREATOR="me";
+
+        public AddressResultReceiver(Handler handler) {
+            super(handler);
+        }
+
+        @Override
+        protected void onReceiveResult(int resultCode, Bundle resultData) {
+
+            // Display the address string
+            // or an error message sent from the intent service.
+            mAddressOutput = resultData.getString(Constants.RESULT_DATA_KEY);
+            displayAddressOutput();
+
+            // Show a toast message if an address was found.
+            if (resultCode == Constants.SUCCESS_RESULT) {
+                //Toast.makeText(MainActivity.this,getString(R.string.address_found),Toast.LENGTH_SHORT).show();
+                Log.d(TAG,"address found");
+            }
+
+        }
+    }//end of inner class
 }

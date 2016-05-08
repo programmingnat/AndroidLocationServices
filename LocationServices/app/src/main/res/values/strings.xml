@@ -1,4 +1,8 @@
 <resources>
     <string name="app_name">LocationServices</string>
     <string name="google_app_id">AIzaSyCsIuegKDW-YkmEa4OB0ktp3DlRmlk_hPw</string>
+    <string name="service_not_available">service not available</string>
+    <string name="invalid_lat_long_used">invalid latitude and longitude used</string>
+    <string name="no_address_found">no address found</string>
+    <string name="address_found">address found</string>
 </resources>
